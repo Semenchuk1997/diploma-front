@@ -6,16 +6,10 @@ import BounceLoader from 'react-spinners/BounceLoader';
 import { css } from '@emotion/core';
 
 import VideoPlayer from '../VideoPlayer';
+import UserCorner from '../UserCorner';
 
-import { URL } from '../global';
+import { URL, awsConfig } from '../config';
 import './index.css';
-
-const config = {
-    bucketName: 'videoondemand-source-1kujxj8xrfj43',
-    region: 'us-east-1',
-    accessKeyId: 'AKIAIZTAUW7CLXVSZVBA',
-    secretAccessKey: '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',
-}
 
 class Gallery extends Component {
     constructor(props) {
@@ -61,7 +55,7 @@ class Gallery extends Component {
 
         this.setState({ isLoading: true });
 
-        S3FileUpload.uploadFile(file, config)
+        S3FileUpload.uploadFile(file, awsConfig)
             .then(data => { 
                 this.setState({ isLoading: false });
                 alert('File sent')
@@ -120,6 +114,7 @@ class Gallery extends Component {
                     items={items}
                     onClick={this.showVideoPlayer}
                 />
+                <UserCorner {...this.props}/>
                 <input
                     type="file"
                     className="file-input"

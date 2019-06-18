@@ -4,6 +4,8 @@ import './index.css';
 const REGISTER_BUTTON_TEXT = 'Register';
 const BACK_BUTTON_TEXT = 'Back';
 
+const users = localStorage.getItem('users') ? JSON.parse(localStorage.getItem('users')) : [];
+const DUID_VALUE = 'UE32ES5500W';
 class Login extends Component {
     constructor(props) {
         super(props);
@@ -15,42 +17,47 @@ class Login extends Component {
             isRegistration: false
         }
 
-        this.primaryButtonHandler = this.primaryButtonHandler.bind(this);
-        this.usernameHandler = this.usernameHandler.bind(this);
-        this.duidHandler = this.duidHandler.bind(this);
-        this.passwordHandler = this.passwordHandler.bind(this);
-        this.confirmPasswordHandler = this.confirmPasswordHandler.bind(this);
         this.isFormValid = this.isFormValid.bind(this);
-        this.registration = this.registration.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.logIn = this.logIn.bind(this);
     }
 
-    primaryButtonHandler(e) {
-        const { username } = this.state;
-        const { history } = this.props
+    logIn(user) {
+        const { history } = this.props;
+        const users = [];
 
-        localStorage.setItem('user', username);
-        history.push('/home');
+        if (localStorage.getItem('users') !== null) {
+            users.push(...JSON.parse(localStorage.getItem('users')));
+        }
+
+        users.push(user);
+
+        localStorage.setItem('users', JSON.stringify(users));
+        history.push('/gallery');
         this.setState({ isRegistration: false });
     }
 
-    usernameHandler(e) {
-        const username  = e.target.value;
-        this.setState({ username });
-    }
+    handleSubmit(event) {
+        event.preventDefault();
 
-    duidHandler(e) {
-        const duid  = e.target.value;
-        this.setState({ duid });
-    }
+        const { username, duid, password, confirmPassword, isRegistration } = this.state;
 
-    passwordHandler(e) {
-        const password  = e.target.value;
-        this.setState({ password });
-    }
+        const user = {
+            username,
+            duid,
+            password,
+            confirmPassword,
+        };
 
-    confirmPasswordHandler(e) {
-        const confirmPassword  = e.target.value;
-        this.setState({ confirmPassword });
+        if (!isRegistration) {
+            if (!!users.find(user => user.username === username)) {
+                this.logIn(user);
+            } else {
+                this.setState({ isShowHelpInfo: true })
+            }
+        } else {
+            this.logIn(user);
+        }
     }
 
     isFormValid() {
@@ -77,7 +84,7 @@ class Login extends Component {
 
     render() {
         return (
-            <form className="login-page" >
+            <form className="login-page" onSubmit={this.handleSubmit}>
                 <h2 className="text-center">Welcome</h2>
                 <div className="form-group">
                     <label>Username *</label>
@@ -85,16 +92,18 @@ class Login extends Component {
                         type="text"
                         className="form-control"
                         placeholder="Username"
-                        onChange={this.usernameHandler}
+                        onChange={(e) => this.setState({ username: e.target.value })}
+                        onFocus={() => this.setState({ isShowHelpInfo: false })}
                     />
+                    {this.state.isShowHelpInfo ? <small id="emailHelp" className="form-text text-danger">User doesn't exist!</small> : null}
                 </div>
-                <div className="form-group">
+                <div className="form-group" hidden={!this.state.isRegistration}>
                     <label>DUID *</label>
                     <input
                         type="text"
                         className="form-control"
                         placeholder="Enter DUID"
-                        onChange={this.duidHandler}
+                        onChange={(e) => this.setState({ duid: e.target.value })}
                     />
                 </div>
                 <div className="form-group">
@@ -103,7 +112,7 @@ class Login extends Component {
                         type="password"
                         className="form-control"
                         placeholder="Password"
-                        onChange={this.passwordHandler}
+                        onChange={(e) => this.setState({ password: e.target.value })}
                     />
                 </div>
                 <div className="form-group" hidden={!this.state.isRegistration}>
@@ -112,13 +121,12 @@ class Login extends Component {
                         type="password"
                         className="form-control"
                         placeholder="Password"
-                        onChange={this.confirmPasswordHandler}
+                        onChange={(e) => this.setState({ confirmPassword: e.target.value })}
                     />
                 </div>
                 <button
-                    type="button"
+                    type="submit"
                     className="btn btn-primary btn-lg btn-block"
-                    onClick={this.primaryButtonHandler}
                     disabled={!this.isFormValid()}
                 >
                     Submit
@@ -127,7 +135,7 @@ class Login extends Component {
                 <button
                     type="button"
                     className="btn btn-secondary btn-lg btn-block mt-2"
-                    onClick={this.registration}
+                    onClick={() => this.setState({ isRegistration: true })}
                 >
                     {this.state.isRegistration ? BACK_BUTTON_TEXT : REGISTER_BUTTON_TEXT}
                 </button>

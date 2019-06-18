@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 import Gallery from './Gallery';
-import VideoPlayer from './VideoPlayer';
+// import VideoPlayer from './VideoPlayer';
 import Login from './Login';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
         <BrowserRouter>
             <Switch>
                 <Route exact path="/" component={Login}/>
-                <Route path="/home" component={Gallery}/>
+                <Route path="/gallery" component={Gallery}/>
             </Switch>
         </BrowserRouter>
     </main>
